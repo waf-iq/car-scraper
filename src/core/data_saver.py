@@ -4,11 +4,12 @@ import cv2
 import uuid
 
 class DataSaver:
-    def __init__(self, base_dir="Dataset", maps_manager=None):
+    def __init__(self, base_dir="Dataset", maps_manager=None, target=150):
         self.base_dir = Path(base_dir)
         self.images_dir = self.base_dir / "images"
         self.labels_dir = self.base_dir / "labels"
         self.maps_manager = maps_manager
+        self.target = target  # images per generation
         
     def get_folder_path(self, make, model, range_str):
         s_make = make.replace(" ", "-")
@@ -16,16 +17,17 @@ class DataSaver:
         s_range = range_str.replace(" ", "-")
         return self.images_dir / s_make / s_model / s_range
 
-    def is_full(self, make, model, range_str, limit=150):
-        """
-        Checks if the generation folder has reached the limit.
-        """
+    def count(self, make, model, range_str):
         folder = self.get_folder_path(make, model, range_str)
         if not folder.exists():
-            return False
-        # Count files. Assumes only images are here.
-        # fast check probably ok for 150 items.
-        return len(list(folder.glob("*.jpg"))) >= limit
+            return 0
+        return len(list(folder.glob("*.jpg")))
+
+    def is_full(self, make, model, range_str, limit=None):
+        """Checks if the generation folder has reached the per-generation target."""
+        if limit is None:
+            limit = self.target
+        return self.count(make, model, range_str) >= limit
 
     def save(self, image_array, bbox_xywhn, make, model, range_str):
         """

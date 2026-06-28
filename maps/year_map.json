@@ -1,3 +1,22 @@
 {
-    "Toyota_Camry_2011-2014": 1
+    "Toyota_Camry_2011-2014": 1,
+    "Toyota_Camry_2007-2010": 2,
+    "Toyota_Camry_2014-2016": 3,
+    "Toyota_Camry_2017-2019": 4,
+    "Toyota_Camry_2020-2022": 5,
+    "Toyota_Camry_2023-2026": 6,
+    "Toyota_Camry_1991-1996": 7,
+    "Toyota_Camry_2011-2013": 8,
+    "Toyota_Corolla_1984": 9,
+    "Toyota_Corolla_1987-1991": 10,
+    "Toyota_Corolla_2004-2006": 11,
+    "Toyota_Corolla_2007-2009": 12,
+    "Toyota_Corolla_2013-2015": 13,
+    "Toyota_Corolla_2019-2021": 14,
+    "Toyota_Corolla_2022-2026": 15,
+    "Honda_Accord_1996-2001": 16,
+    "Honda_Accord_1993-1995": 17,
+    "Honda_Accord_2005-2007": 18,
+    "Honda_Accord_1976-1980": 19,
+    "Toyota_Camry_2004-2006": 20
 }

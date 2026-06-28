@@ -1,0 +1,20 @@
+{
+  "scraper": "truecar",
+  "base_url": "https://www.truecar.com",
+  "engine": "undetected",
+  "headless": false,
+  "chrome_version": null,
+  "proxy": null,
+  "user_data_dir": ".tc_profile",
+  "max_pages": 10,
+  "max_images_per_listing": 5,
+  "image_width": 1280,
+  "page_dwell": [5, 11],
+  "selectors": {
+    "card": "[data-test=\"vehicleListingCard\"]",
+    "ymm": "[data-test=\"vehicleListingCardYearMakeModel\"]",
+    "img": "[data-test=\"listingCardImage\"]",
+    "next": "a[data-test=\"Pagination-directional-next\"]"
+  },
+  "_note": "Verified working via undetected-chromedriver on a residential IP. 'engine':'undetected' beats PerimeterX fingerprinting (page 1 loads reliably). Direct navigation to ?page=2+ can trigger a fresh PerimeterX challenge -- with 'user_data_dir' set, run once with headless=false, solve the press-and-hold challenge in the visible window, and the clearance cookie persists so later pages/runs work. No proxy needed on a normal IP; set 'proxy' only if flagged or scraping at high volume. 'chrome_version':null auto-detects. Selectors taken from the live DOM 2026-06."
+}

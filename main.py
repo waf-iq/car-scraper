@@ -1,39 +1,69 @@
 import argparse
+
 from src.core.maps_manager import MapsManager
 from src.core.config_loader import ConfigLoader
 from src.core.pipeline import Pipeline
-# Import specific scrapers here or dynamically load
-# from src.scrapers.site_a import SiteAScraper 
+from src.scrapers.commons import CommonsScraper
+from src.scrapers.truecar import TrueCarScraper
+
+SCRAPERS = {
+    "commons": CommonsScraper,
+    "truecar": TrueCarScraper,
+}
+
+
+def parse_models(s):
+    """'Toyota:Camry,Toyota:Corolla' -> [('Toyota','Camry'),('Toyota','Corolla')]"""
+    out = []
+    for part in (s or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        make, _, model = part.partition(":")
+        if make and model:
+            out.append((make.strip(), model.strip()))
+    return out
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Car Scraper Pipeline")
-    parser.add_argument("--site", type=str, help="Name of the site config to run")
-    parser.add_argument("--list-sites", action="store_true", help="List available configs")
+    parser = argparse.ArgumentParser(description="Car listings image scraper")
+    parser.add_argument("--site", choices=list(SCRAPERS), help="Scraper to run")
+    parser.add_argument("--models", type=str, help="Make:Model[,Make:Model...] to collect")
+    parser.add_argument("--target", type=int, default=150, help="Images per generation")
+    parser.add_argument("--dataset", type=str, default="Dataset", help="Output dataset dir")
+    parser.add_argument("--maps", type=str, default="maps", help="Maps dir")
+    parser.add_argument("--list-sites", action="store_true")
+    parser.add_argument("--test", action="store_true", help="Tight caps for a smoke test")
     args = parser.parse_args()
-    
-    config_loader = ConfigLoader()
-    
+
     if args.list_sites:
-        print("Available configs:", config_loader.list_configs())
+        print("Available scrapers:", list(SCRAPERS))
+        return
+    if not args.site or not args.models:
+        print("Usage: python main.py --site commons --models 'Toyota:Camry,Honda:Accord' [--target N] [--test]")
         return
 
-    maps_manager = MapsManager()
-    pipeline = Pipeline(config_loader, maps_manager)
-    
-    # Logic to load the correct scraper class
-    # For now, since we don't have concrete scrapers, we will just print message
-    if args.site:
-        print(f"Initializing scraper for {args.site}...")
-        try:
-            config = config_loader.load_config(args.site)
-            # Here we would instantiate the scraper based on the config or a registry
-            # scraper = ScraperRegistry.get(args.site)(config)
-            # pipeline.process_scraper(scraper)
-            print("Scraper not yet implemented. Please create a scraper class in src/scrapers/")
-        except Exception as e:
-            print(f"Error: {e}")
-    else:
-        print("Please provide --site")
+    targets = parse_models(args.models)
+    if not targets:
+        print("No valid --models parsed. Use Make:Model,Make:Model")
+        return
+
+    if args.test:
+        args.target = min(args.target, 8)
+
+    config_loader = ConfigLoader()
+    try:
+        config = config_loader.load_config(args.site)
+    except FileNotFoundError:
+        config = {}
+
+    maps_manager = MapsManager(args.maps)
+    pipeline = Pipeline(config_loader, maps_manager, target=args.target, dataset_dir=args.dataset)
+
+    scraper = SCRAPERS[args.site](config)
+    print(f"Running {args.site} for {targets} (target {args.target}/generation)")
+    pipeline.process_scraper(scraper, targets)
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,8 @@
+{
+  "scraper": "commons",
+  "max_depth": 3,
+  "per_model_cap": 60,
+  "headers": {
+    "User-Agent": "car-scraper-dataset-builder/1.0 (research; contact: waskaki@gmail.com)"
+  }
+}
